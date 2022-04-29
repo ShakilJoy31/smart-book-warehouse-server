@@ -14,7 +14,9 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run(){
     try{
         await client.connect(); 
-        const booksCollection = client.db('smartBook').collection('allBook'); 
+        const booksCollection = client.db('smartBook').collection('allBook');
+
+        const booksCollectionWithEmail = client.db('smartBook').collection('emailWiseBook'); 
 
         // Getting all collcetion from database. 
         app.get('/books', async (req, res)=>{
@@ -71,7 +73,31 @@ async function run(){
             const foundId = {_id:ObjectId(id)}; 
             const result = await booksCollection.deleteOne(foundId); 
             res.send(result); 
-        })
+        }); 
+
+        // Add a new book to the database. 
+
+        app.post('/addBook', async (req, res)=>{
+            const newBook = req.body; 
+            const sentBookToTheDatabase = await booksCollection.insertOne(newBook); 
+            res.send(sentBookToTheDatabase); 
+        }); 
+
+
+        
+        // Add books email wise
+        app.post('/addBook', async (req, res) => {
+            const newBook = req.body; 
+            const sentBookToTheDatabase = await booksCollection.insertOne(newBook); 
+            res.send(sentBookToTheDatabase); 
+        }); 
+        // Gettig the books email wise from the database. 
+        app.get('/addBook', async (req, res)=>{
+            const query = {}; 
+            const getBook = booksCollection.find(query); 
+            const result = await getBook.toArray(); 
+            res.send(result); 
+        }); 
     }
     finally{
 
