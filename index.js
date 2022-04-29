@@ -32,6 +32,46 @@ async function run(){
             const getBook = await booksCollection.findOne(query); 
             res.send(getBook); 
         }); 
+
+        // Updating quantity 
+        app.put('/updateQuantity/:id', async (req, res)=>{
+            const id = req.params.id; 
+            const updatedQuantity = req.body; 
+            const getId = {_id:ObjectId(id)}; 
+            const option = {upsert: true}; 
+            const updateDoc = {
+                $set: {
+                    quantity : updatedQuantity.quantity 
+            }
+        }; 
+        const result = await booksCollection.updateOne(getId, updateDoc,option); 
+        res.send(result); 
+        }); 
+
+
+        // Stocked quantity update stockedQuantity
+        app.put('/stockedQuantity/:id', async (req, res)=>{
+            const id = req.params.id; 
+            const updatedStock = req.body; 
+            console.log(updatedStock); 
+            const getId = {_id:ObjectId(id)}; 
+            const option = {upsert: true}; 
+            const updateDoc = {
+                $set: {
+                    quantity : updatedStock.totalQuantity
+                }
+            }; 
+            const result = await booksCollection.updateOne(getId, updateDoc, option); 
+            res.send(result); 
+        }); 
+
+        // Delete a particular item from database. 
+        app.delete('/delete/:id', async (req, res) => {
+            const id = req.params.id; 
+            const foundId = {_id:ObjectId(id)}; 
+            const result = await booksCollection.deleteOne(foundId); 
+            res.send(result); 
+        })
     }
     finally{
 
@@ -49,3 +89,4 @@ app.get('/', (req, res)=>{
 app.listen(port, ()=> {
     console.log('Listening to the port ',port); 
 })
+
