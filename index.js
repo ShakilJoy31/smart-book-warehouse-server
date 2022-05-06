@@ -45,6 +45,17 @@ async function run() {
             res.send({ accessToken });
         })
 
+        app.post('/signInToken', async (req, res) => {
+            const user = await req.body;
+            console.log('got email ',user.email); 
+            const accessToken = jwt.sign(user, process.env.AccessTokenSecret, {
+                expiresIn: '1d'
+            });
+            res.send({ accessToken });
+        })   
+
+        
+
 
 
         // Getting all collcetion from database. 
@@ -60,6 +71,8 @@ async function run() {
         app.get(`/particularBook/:id`, verifyJWT, async (req, res) => {
             const decodedEmail = req?.decoded?.email;
             const email = req?.headers?.email;
+            console.log(decodedEmail); 
+            console.log(email); 
             if (decodedEmail === email) {
                 const id = req.params.id;
                 const query = { _id: ObjectId(id) };
@@ -136,9 +149,7 @@ async function run() {
                 const query = {};
                 const getBook = booksCollection.find(query);
                 const result = await getBook.toArray();
-                res.send(result);
-                console.log('docoded email ',decodedEmail)
-                console.log('my email ',email); 
+                res.send(result); 
             }
             else {
                 res.status(403).send({ message: 'Forbidden Access' })
@@ -169,4 +180,3 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
     console.log('Listening to the port ', port);
 })
-
